@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";
 import { AppShell } from "../../components/AppShell.tsx";
+import { Phrases } from "../../components/Phrases.tsx";
 import { HelpButton, TopBar } from "../../components/TopBar.tsx";
 import { RETENTION_DAYS } from "../../lib/readings.ts";
 import { goBack } from "../../lib/router.ts";
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, children }: { title: string | string[]; children: ReactNode }) {
   return (
     <section
       className={css({
@@ -18,8 +19,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
         borderRadius: "lg",
       })}
     >
-      <h2 className={css({ fontSize: "md", fontWeight: "bold", wordBreak: "auto-phrase" })}>
-        {title}
+      <h2 className={css({ fontSize: "md", fontWeight: "bold" })}>
+        {typeof title === "string" ? title : <Phrases>{title}</Phrases>}
       </h2>
       {children}
     </section>
@@ -44,7 +45,7 @@ export function AboutPage() {
             応募サイトの運営・レーベル・アーティストとは関係ありません。応募サイトの仕様が変わると、使えなくなる場合があります。
           </p>
         </Section>
-        <Section title="写真もシリアルナンバーも端末の外へ送りません">
+        <Section title={["写真もシリアルナンバーも", "端末の外へ送りません"]}>
           <p>
             文字の読み取りは端末の中で行います。結果は、この端末のブラウザのみに保存します。通信は、初回のダウンロード(約31MB)のみです。
           </p>

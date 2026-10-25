@@ -1,9 +1,10 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { css, cx } from "styled-system/css";
 import { AppShell } from "../../components/AppShell.tsx";
 import { Button } from "../../components/Button.tsx";
 import { Icon, type IconName } from "../../components/Icon.tsx";
-import { AppBar, HeaderActions } from "../../components/TopBar.tsx";
+import { AppBar } from "../../components/TopBar.tsx";
+import { describeModelError } from "../../lib/modelError.ts";
 import { type ModelStatus, useModelStatus } from "../../lib/ocr.ts";
 import { navigate } from "../../lib/router.ts";
 import {
@@ -17,6 +18,7 @@ import {
 } from "../../lib/scanJob.ts";
 import { usePhotoInputs } from "./PhotoPicker.tsx";
 import { PhotoViewer } from "./PhotoViewer.tsx";
+import { Body, card, h1, muted, PhotoPreview, Summary } from "./Summary.tsx";
 
 /**
  * 読み取り中の写真で、今していること。文字の行を探す間（約2秒）は件数が増えないため、
@@ -60,38 +62,6 @@ export function ScanPage() {
   }
   return <Empty />;
 }
-
-/** 本文。上から順に並べ、`bottom` は画面の下端に置く。 */
-function Body({ children, bottom }: { children: ReactNode; bottom?: ReactNode }) {
-  return (
-    <div
-      className={css({
-        flex: "1",
-        display: "flex",
-        flexDirection: "column",
-        gap: "5",
-        px: "4",
-        pt: "6",
-        pb: "4",
-      })}
-    >
-      {children}
-      {bottom && (
-        <div className={css({ mt: "auto", display: "grid", gap: "3", pt: "2" })}>{bottom}</div>
-      )}
-    </div>
-  );
-}
-
-const h1 = css({
-  fontSize: "2xl",
-  fontWeight: "bold",
-  lineHeight: "snug",
-  // 狭い画面で折り返すとき、対応しているブラウザでは文節の区切りで折り返す
-  wordBreak: "auto-phrase",
-});
-
-const muted = css({ fontSize: "sm", color: "fg.muted" });
 
 function Bar({ ratio, label, thick = false }: { ratio: number; label: string; thick?: boolean }) {
   const pct = Math.round(ratio * 100);
@@ -274,74 +244,6 @@ function StatusBadge({ tone, icon, text }: { tone: "ok" | "warn"; icon: IconName
   );
 }
 
-/** まとめの画面の共通の形。上に印・見出し・説明、下端にボタンを置く。 */
-function Summary({
-  icon,
-  tone = "warn",
-  title,
-  lead,
-  children,
-  bottom,
-  backToTop = true,
-}: {
-  icon: IconName;
-  tone?: "warn" | "danger";
-  title: string;
-  lead: string;
-  children?: ReactNode;
-  bottom: ReactNode;
-  /** 下端に「トップへ戻る」を置くか */
-  backToTop?: boolean;
-}) {
-  return (
-    <AppShell header={<AppBar actions={<HeaderActions />} />} fill>
-      <Body
-        bottom={
-          <>
-            {bottom}
-            {/* ヘッダーに戻るボタンを置かない画面のため、トップへの道をここに残す */}
-            {backToTop && (
-              <Button variant="ghost" onClick={() => navigate({ name: "top" }, { replace: true })}>
-                トップへ戻る
-              </Button>
-            )}
-          </>
-        }
-      >
-        <div className={css({ display: "grid", gap: "3", justifyItems: "start" })}>
-          <span
-            className={css({
-              w: "[72px]",
-              h: "[72px]",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "full",
-              bg: tone === "warn" ? "warn.subtle" : "danger.subtle",
-              color: tone === "warn" ? "warn" : "danger",
-            })}
-          >
-            <Icon name={icon} size={32} />
-          </span>
-          <h1 className={h1}>{title}</h1>
-          <p className={css({ color: "fg.muted" })}>{lead}</p>
-        </div>
-        {children}
-      </Body>
-    </AppShell>
-  );
-}
-
-const card = css({
-  display: "grid",
-  gap: "3",
-  p: "4",
-  bg: "bg.surface",
-  borderWidth: "1px",
-  borderColor: "border",
-  borderRadius: "lg",
-});
-
 const TIPS = [
   "明るい場所で、影を入れない",
   "紙を平らにし、折れを伸ばす",
@@ -354,7 +256,7 @@ function Empty() {
   return (
     <Summary
       icon="search"
-      title="シリアルナンバーが見つかりませんでした"
+      title={["シリアルナンバーが", "見つかりませんでした"]}
       lead="撮り直すと、読み取れる場合があります。"
       bottom={
         <>
@@ -404,79 +306,6 @@ function missingReason(photo: PhotoState | undefined): string {
   }
 }
 
-/**
- * 見つからなかった写真の小さな見本。「何枚目」だけでは、どの写真か思い出しにくいため。
- * 開けなかった写真には見本がないため、写真の印を出す。
- */
-function PhotoPreview({
-  blob,
-  label,
-  onOpen,
-}: {
-  blob?: Blob;
-  label: string;
-  /** 押したときに写真を大きく見せる。開けなかった写真では渡さない */
-  onOpen?: () => void;
-}) {
-  const [url, setUrl] = useState<string>();
-  useEffect(() => {
-    if (!blob) return;
-    const u = URL.createObjectURL(blob);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [blob]);
-  const box = css({
-    flex: "none",
-    position: "relative",
-    w: "16",
-    h: "16",
-    borderRadius: "md",
-    borderWidth: "1px",
-    borderColor: "border",
-    bg: "bg.sunken",
-    overflow: "hidden",
-  });
-  if (!blob || !url || !onOpen) {
-    return (
-      <span
-        aria-hidden="true"
-        className={cx(
-          box,
-          css({
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "fg.muted",
-          }),
-        )}
-      >
-        <Icon name="image" />
-      </span>
-    );
-  }
-  return (
-    <button type="button" aria-label={`${label}を大きく見る`} onClick={onOpen} className={box}>
-      <img src={url} alt="" className={css({ w: "full", h: "full", objectFit: "cover" })} />
-      {/* 押すと大きく見られることを示す印 */}
-      <span
-        aria-hidden="true"
-        className={css({
-          position: "absolute",
-          right: "0.5",
-          bottom: "0.5",
-          display: "inline-flex",
-          p: "0.5",
-          borderRadius: "sm",
-          bg: "bg.surface",
-          color: "fg",
-        })}
-      >
-        <Icon name="zoom" size={14} />
-      </span>
-    </button>
-  );
-}
-
 /** シリアルナンバーが見つからなかった写真（開けなかった写真を含む）があったときのまとめ。 */
 function PhotoMissing({ job, missing }: { job: ScanJob; missing: number[] }) {
   const { openCamera, openFiles, inputs } = usePhotoInputs();
@@ -486,7 +315,11 @@ function PhotoMissing({ job, missing }: { job: ScanJob; missing: number[] }) {
   return (
     <Summary
       icon="warn"
-      title={`${total}枚中${missing.length}枚からは、シリアルナンバーが見つかりませんでした`}
+      title={[
+        `${total}枚中${missing.length}枚からは、`,
+        "シリアルナンバーが",
+        "見つかりませんでした",
+      ]}
       lead={
         job.added > 0
           ? `ほかの${okCount}枚から、シリアルナンバーを${job.added}件読み取りました。`
@@ -543,15 +376,21 @@ function PhotoMissing({ job, missing }: { job: ScanJob; missing: number[] }) {
   );
 }
 
-const RETRY_STEPS = ["Wi-Fiやモバイル通信の接続を確認", "下の「開き直す」を押す"];
+const RETRY_STEPS = [
+  "Wi-Fiやモバイル通信の接続を確認",
+  "下の「開き直す」を押す",
+  // 保存したデータがあっても、ブラウザがこのページの古い状態を持ったままだと読めないことがあった（iPhoneのSafari）
+  "直らない場合は、ブラウザ(Safariなど)をいったん終了して開き直す",
+];
 
 /** 文字認識のモデル（約31MB）を読み込めなかったときの画面。 */
 function ModelFailed() {
+  const model = useModelStatus();
   return (
     <Summary
       icon="offline"
       tone="danger"
-      title="スキャンの準備に失敗しました"
+      title={["スキャンの準備に", "失敗しました"]}
       lead="スキャンに必要なデータ(約31MB)をダウンロードできませんでした。写真やシリアルナンバーは送信していません。"
       backToTop={false}
       bottom={
@@ -593,6 +432,15 @@ function ModelFailed() {
           ))}
         </ol>
       </section>
+      {model.kind === "error" && (
+        // 問い合わせや原因の確認に使えるよう、元の文も小さく添える
+        <p className={cx(muted, css({ fontSize: "xs" }))}>
+          原因: {describeModelError(model.reason)}
+          <span className={css({ display: "block", wordBreak: "break-all" })}>
+            ({model.reason})
+          </span>
+        </p>
+      )}
     </Summary>
   );
 }

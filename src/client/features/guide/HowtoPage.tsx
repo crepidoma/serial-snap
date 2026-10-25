@@ -5,6 +5,7 @@ import { Icon } from "../../components/Icon.tsx";
 import { useBookmarkletInstalled } from "../../lib/bookmarklet.ts";
 import { goBack, navigate } from "../../lib/router.ts";
 import {
+  BookmarkletAbout,
   CopyBarMock,
   FilledMock,
   Highlight,
@@ -365,7 +366,7 @@ function steps() {
         <PapersShot />
       </Shot>
       <Lead>
-        シリアルナンバーの紙を並べて撮ります。向きがバラバラでも大丈夫です。写真は何枚でも選べます。
+        シリアルナンバーの紙を並べて撮ります。向きがバラバラでも大丈夫です。続けて何枚でも撮れ、撮ってある写真も選べます。
       </Lead>
     </>,
     <>
@@ -387,13 +388,14 @@ function steps() {
       </Lead>
     </>,
     <>
-      <StepTitle>応募サイトで貼り付け</StepTitle>
+      <StepTitle>{["応募サイトで", "貼り付け"]}</StepTitle>
       <Shot>
         <FilledMock highlightSubmit={false} motion="fill" />
       </Shot>
       <Lead>
-        応募サイトで、追加したブックマークレットを開き「クリップボードから入力」を押すと、入力欄にシリアルナンバーが入ります。ブックマークレットの追加は、最初に一度のみです。
+        応募サイトで、追加したブックマークレットを開き「クリップボードから入力」を押すと、入力欄にシリアルナンバーが入ります。
       </Lead>
+      <BookmarkletAbout />
     </>,
     <>
       <StepTitle>確認して登録</StepTitle>

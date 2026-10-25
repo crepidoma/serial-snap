@@ -1,6 +1,7 @@
 import { css } from "styled-system/css";
 import { Button } from "../../components/Button.tsx";
 import { Icon } from "../../components/Icon.tsx";
+import { Phrases } from "../../components/Phrases.tsx";
 import { markBookmarkletInstalled } from "../../lib/bookmarklet.ts";
 import { navigate } from "../../lib/router.ts";
 
@@ -41,8 +42,8 @@ export function BookmarkletPrompt({ onClose }: { onClose: () => void }) {
       >
         <Icon name="bookmark" />
         <div className={css({ display: "grid", gap: "0.5" })}>
-          <b className={css({ wordBreak: "auto-phrase" })}>
-            貼り付けにはブックマークレットを使います
+          <b>
+            <Phrases>{["貼り付けには", "ブックマークレットを", "使います"]}</Phrases>
           </b>
           <span className={css({ fontSize: "sm", color: "fg.muted" })}>
             最初に一度のみ追加が必要です。

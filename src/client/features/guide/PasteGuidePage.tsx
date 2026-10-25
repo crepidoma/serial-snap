@@ -73,7 +73,7 @@ function LoopArrow() {
 function steps() {
   return [
     <>
-      <StepTitle>「1〜10件目をコピー」を押す</StepTitle>
+      <StepTitle>{["「1〜10件目をコピー」を", "押す"]}</StepTitle>
       <Lead>応募サイトの登録は、一度に10件までです。10件ずつコピーします。</Lead>
       <Shot>
         <ShotCaption>スキャン結果の画面の、いちばん下</ShotCaption>
@@ -84,7 +84,7 @@ function steps() {
       </Note>
     </>,
     <>
-      <StepTitle>応募サイトにログインしシリアルナンバー登録の画面を開く</StepTitle>
+      <StepTitle>{["応募サイトにログインし", "シリアルナンバー登録の", "画面を開く"]}</StepTitle>
       <Shot>
         <ShotCaption>シリアルナンバーの入力欄が並んだ画面</ShotCaption>
         <Mock>
@@ -106,7 +106,7 @@ function steps() {
       </Lead>
     </>,
     <>
-      <StepTitle>ブックマークから追加したブックマークレットを開く</StepTitle>
+      <StepTitle>{["ブックマークから", "追加したブックマークレットを", "開く"]}</StepTitle>
       <Shot>
         <ShotCaption>iPhone：ブックマークの一覧から選ぶ</ShotCaption>
         <Mock>
@@ -146,7 +146,7 @@ function steps() {
       </Lead>
     </>,
     <>
-      <StepTitle>内容を確認し登録ボタンを自分で押す</StepTitle>
+      <StepTitle>{["内容を確認し", "登録ボタンを", "自分で押す"]}</StepTitle>
       <Shot>
         <FilledMock />
       </Shot>
@@ -155,7 +155,7 @@ function steps() {
       </Note>
     </>,
     <>
-      <StepTitle>11件以上ある場合は繰り返す</StepTitle>
+      <StepTitle>{["11件以上ある場合は", "繰り返す"]}</StepTitle>
       <Lead>登録が終わったら、アプリで次の10件をコピーします。</Lead>
       <Shot>
         <ol className={css({ display: "grid", gap: "2" })}>

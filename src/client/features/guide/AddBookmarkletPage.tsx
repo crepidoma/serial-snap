@@ -7,6 +7,7 @@ import { useBookmarkletInstalled } from "../../lib/bookmarklet.ts";
 import { copyText } from "../../lib/clipboard.ts";
 import { goBack } from "../../lib/router.ts";
 import {
+  BookmarkletAbout,
   CodeSample,
   Example,
   Highlight,
@@ -134,12 +135,7 @@ function CopyStep({ onNext }: { onNext: () => void }) {
           </Highlight>
         )}
       </Shot>
-      <Note icon="bookmark">
-        <b>ブックマークレットとは</b>
-        <span>
-          応募サイトの入力欄にシリアルナンバーをまとめて入れるブックマークです。追加は最初に一度のみです。
-        </span>
-      </Note>
+      <BookmarkletAbout />
     </>
   );
 }
@@ -205,7 +201,7 @@ function iosSteps(next: () => void) {
   return [
     <CopyStep key="1" onNext={next} />,
     <>
-      <StepTitle>追加したブックマークを長押しして「編集」</StepTitle>
+      <StepTitle>{["追加したブックマークを", "長押しして「編集」"]}</StepTitle>
       <Lead>
         このページを、いつもの方法でブックマークに追加します。名前は自由です。追加したら、ブックマークの一覧で長押しします。
       </Lead>
@@ -243,7 +239,7 @@ function iosSteps(next: () => void) {
       </Shot>
     </>,
     <>
-      <StepTitle>アドレスを消してプログラムを貼り付け</StepTitle>
+      <StepTitle>{["アドレスを消して", "プログラムを貼り付け"]}</StepTitle>
       <Shot>
         <IosBookmarkCard
           address={
@@ -316,7 +312,7 @@ function androidSteps(next: () => void) {
   return [
     <CopyStep key="1" onNext={next} />,
     <>
-      <StepTitle>右上の「︙」から☆を押す</StepTitle>
+      <StepTitle>{["右上の「︙」から", "☆を押す"]}</StepTitle>
       <Shot>
         <ShotCaption>
           <Mark n={1} />
@@ -339,7 +335,7 @@ function androidSteps(next: () => void) {
       <Lead>このページを開いたまま操作します。☆で、このページがブックマークに入ります。</Lead>
     </>,
     <>
-      <StepTitle>ブックマークの一覧から「編集」</StepTitle>
+      <StepTitle>{["ブックマークの一覧から", "「編集」"]}</StepTitle>
       <Shot>
         <ShotCaption>
           <Mark n={1} />
@@ -385,7 +381,7 @@ function androidSteps(next: () => void) {
       <Lead muted>☆を押した直後に画面下に出る表示に「編集」があれば、そこからも開けます。</Lead>
     </>,
     <>
-      <StepTitle>名前とURLを書き換える</StepTitle>
+      <StepTitle>{["名前とURLを", "書き換える"]}</StepTitle>
       <Shot>
         <Mock>
           <MockRow>
@@ -708,10 +704,11 @@ function pcSteps() {
   const keyLabel = css({ w: "20", fontSize: "sm", fontWeight: "bold" });
   return [
     <>
-      <StepTitle>ブックマークバーを表示</StepTitle>
+      <StepTitle>{["ブックマークバーを", "表示"]}</StepTitle>
       <Lead>
-        アドレスバーのすぐ下に、ブックマークを並べる帯（ブックマークバー）を表示します。表示済みなら、次へ進みます。
+        アドレスバーのすぐ下に、ブックマークを並べる帯(ブックマークバー)を表示します。表示済みなら、次へ進みます。
       </Lead>
+      <BookmarkletAbout />
       <Shot>
         <BrowserMock bar="highlight" />
         <ShotCaption>↑ アドレスバーの下の帯がブックマークバーです</ShotCaption>
@@ -729,7 +726,7 @@ function pcSteps() {
       </Lead>
     </>,
     <>
-      <StepTitle>下のボタンをブックマークバーへドラッグ</StepTitle>
+      <StepTitle>{["下のボタンを", "ブックマークバーへ", "ドラッグ"]}</StepTitle>
       <Lead>
         ボタンを押したまま、画面上部のブックマークバーまで動かして離します。名前は、あとで自由に変えられます。
       </Lead>
