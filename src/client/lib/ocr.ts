@@ -76,7 +76,8 @@ export class ScanCancelled extends Error {
 export type ModelStatus =
   | { kind: "loading"; progress: number }
   | { kind: "ready" }
-  | { kind: "error" };
+  /** `reason` は Worker から届いたエラーの文（画面では言い換えて出す） */
+  | { kind: "error"; reason: string };
 
 /**
  * 文字認識のWorkerを1つだけ持ち、写真を1枚ずつ順に渡す。
@@ -124,7 +125,7 @@ class OcrClient {
         : msg.type === "ready"
           ? { kind: "ready" }
           : msg.type === "error" && msg.id === -1
-            ? { kind: "error" }
+            ? { kind: "error", reason: msg.message }
             : undefined;
     if (!next) return;
     // 画面には理由を出さないため、調べられるよう記録する

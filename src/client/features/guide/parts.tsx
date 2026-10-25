@@ -1,20 +1,13 @@
 import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { css, cx } from "styled-system/css";
 import { Icon, type IconName } from "../../components/Icon.tsx";
+import { Phrases } from "../../components/Phrases.tsx";
 
-/** 案内の見出し。 */
-export function StepTitle({ children }: { children: ReactNode }) {
+/** 案内の見出し。長い見出しは文節ごとの配列で渡し、狭い画面でも文節の区切りで折り返す。 */
+export function StepTitle({ children }: { children: string | string[] }) {
   return (
-    <h2
-      className={css({
-        fontSize: "xl",
-        fontWeight: "bold",
-        lineHeight: "snug",
-        // 狭い画面で折り返すとき、対応しているブラウザでは文節の区切りで折り返す
-        wordBreak: "auto-phrase",
-      })}
-    >
-      {children}
+    <h2 className={css({ fontSize: "xl", fontWeight: "bold", lineHeight: "snug" })}>
+      {typeof children === "string" ? children : <Phrases>{children}</Phrases>}
     </h2>
   );
 }
@@ -248,6 +241,18 @@ export function Note({
       <Icon name={icon} />
       <div className={css({ display: "grid", gap: "0.5" })}>{children}</div>
     </div>
+  );
+}
+
+/** 「ブックマークレットとは」の説明。案内で初めてこの言葉が出るところに置く。 */
+export function BookmarkletAbout() {
+  return (
+    <Note icon="bookmark">
+      <b>ブックマークレットとは</b>
+      <span>
+        応募サイトの入力欄にシリアルナンバーをまとめて入れるブックマークです。追加は最初に一度のみです。
+      </span>
+    </Note>
   );
 }
 

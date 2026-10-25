@@ -26,6 +26,7 @@
     "src/ocr/quality.ts",
     "src/client/lib/checks.ts",
     "src/client/lib/format.ts",
+    "src/client/lib/modelError.ts",
     "src/client/lib/readings.ts",
     "src/client/lib/storage.ts",
     "src/bookmarklet/plan.ts"
