@@ -24,10 +24,52 @@
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="ｼﾘｱﾙｽﾅｯﾌﾟ" />
-    <title>シリアルスナップ</title>
+    <title>シリアルスナップ｜forTUNE meetsのシリアルナンバーを写真から読み取り</title>
+    <!--
+      検索結果とSNSで共有したときの表示。画面はURLのハッシュで切り替えるため、載せるページは / だけ。
+      共有の画像は絶対URLでないと読まれないため、公開先（docs/deploy.md）のURLを書く。og-image.png はデザインキャンバスの「共有画像」の画板を書き出したもの。
+    -->
+    <meta
+      name="description"
+      content="forTUNE meets（フォーチュンミーツ）の応募券を撮影するだけで、シリアルナンバーをまとめて読み取る非公式ツール。10件ずつコピーして、応募サイトへ貼り付けられます。写真もシリアルナンバーも端末の外へ送りません。"
+    />
+    <link rel="canonical" href="https://serial-snap.yabworks.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="シリアルスナップ" />
+    <meta property="og:title" content="シリアルスナップ" />
+    <meta
+      property="og:description"
+      content="応募券を撮影するだけで、forTUNE meetsのシリアルナンバーをまとめて読み取る非公式ツール。写真もシリアルナンバーも端末の外へ送りません。"
+    />
+    <meta property="og:url" content="https://serial-snap.yabworks.com/" />
+    <meta property="og:image" content="https://serial-snap.yabworks.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="シリアルスナップ。応募券を撮影するだけで、シリアルナンバーをまとめて読み取り。写真もシリアルナンバーも、端末の外へ送りません" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- 検索エンジン向けのアプリの説明。実行されないデータのため、CSP の script-src に掛からない -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "シリアルスナップ",
+        "url": "https://serial-snap.yabworks.com/",
+        "description": "forTUNE meetsの応募券を撮影して、シリアルナンバーをまとめて読み取る非公式ツール。",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "iOS, Android, Windows, macOS",
+        "browserRequirements": "JavaScriptとWebAssemblyが動くブラウザ",
+        "inLanguage": "ja",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      シリアルスナップは、forTUNE meetsのシリアルナンバーを写真から読み取る非公式ツールです。読み取りは端末の中で行うため、JavaScriptを有効にしてお使いください。
+    </noscript>
     <script type="module" src="./src/client/main.tsx"></script>
   </body>
 </html>

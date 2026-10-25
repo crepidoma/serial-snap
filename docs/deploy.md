@@ -10,6 +10,7 @@
   - COOP/COEP（文字認識を複数スレッドにする）、`X-Content-Type-Options`・`Referrer-Policy`・`frame-ancestors`。
   - 画面と `sw.js` は `max-age=0` で毎回確かめ、`no-transform` で Cloudflare に HTML を書き換えさせない（ゾーンの Web Analytics の自動挿入や Email Obfuscation が入らないように）。
   - `assets/` の下は名前にハッシュが入るため、1年キャッシュする。
+- 検索エンジンとSNS向けに、`index.html` に説明・canonical・OGP・構造化データ（JSON-LD）を書き、`robots.txt`・`sitemap.xml`・`og-image.png` を置く。画面はハッシュで切り替えるため、載せるURLは `/` だけ。この3ファイルは画面が使わないため、Service Workerは保存しない。`og-image.png` はデザインキャンバスの「共有画像」の画板を書き出したもので、文言やロゴを変えたら作り直す。公開先のURLを変えたら、これらの絶対URLも直す。
 - 1ファイル25MiBの上限があるが、最も大きいWASMでも約14MBで収まる。
 - 静的アセットへのリクエストは無料で、Worker の呼び出しに数えない。
 
