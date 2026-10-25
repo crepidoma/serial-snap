@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // 画面とファイルを配るだけで、Workerのコードは持たない（静的アセットへのリクエストは無料で、Workerの呼び出しにも数えない）。
+  "name": "serial-snap",
+  "compatibility_date": "2026-10-25",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    // 画面はURLのハッシュで切り替えるため、ないパスに index.html を返さない
+    "not_found_handling": "none"
+  },
+  "routes": [{ "pattern": "serial-snap.yabworks.com", "custom_domain": true }]
+}
