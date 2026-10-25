@@ -69,7 +69,7 @@ export function TopPage() {
     <AppShell
       header={
         <>
-          <AppBar actions={<HeaderActions />} />
+          <AppBar actions={<HeaderActions />} heading />
           <PrivacyBand />
         </>
       }

@@ -11,6 +11,7 @@ import { Logo } from "./Logo.tsx";
  * @param back 戻るボタンの押したときの動きと、読み上げの名前
  * @param sub 題の下に小さく添える文（「あと29日で削除」など）
  * @param compact 題を一段小さくする（読み取り結果の日時のように、長い題で右の操作と並べるとき）
+ * @param heading 題をページの見出し（h1）にする。本文に見出しのない画面（トップ）で使う
  */
 export function TopBar({
   title,
@@ -19,6 +20,7 @@ export function TopBar({
   back,
   actions,
   compact = false,
+  heading = false,
 }: {
   title: ReactNode;
   sub?: ReactNode;
@@ -27,7 +29,9 @@ export function TopBar({
   back?: { label: string; onClick: () => void };
   actions?: ReactNode;
   compact?: boolean;
+  heading?: boolean;
 }) {
+  const Title = heading ? "h1" : "span";
   return (
     <div
       className={cx(
@@ -64,7 +68,7 @@ export function TopBar({
       {leading}
       <div className={css({ flex: "1", minW: "0", display: "flex", flexDirection: "column" })}>
         <div className={css({ display: "flex", alignItems: "center", gap: "2" })}>
-          <span
+          <Title
             className={css({
               fontSize: compact ? "md" : "lg",
               fontWeight: "bold",
@@ -75,7 +79,7 @@ export function TopBar({
             })}
           >
             {title}
-          </span>
+          </Title>
         </div>
         {sub && (
           <span className={css({ fontSize: "xs", color: "fg.muted", lineHeight: "tight" })}>
@@ -123,14 +127,16 @@ export function HeaderActions() {
  * アプリの名前のヘッダー。トップと、読み取り中・まとめの画面のように、
  * 画面の名前を題にしない（本文の見出しで示す）画面で使う。
  * @param actions 右に置く操作。スキャン中は画面を離れないよう置かない
+ * @param heading アプリの名前をページの見出し（h1）にする。トップで使う（検索エンジンがページの主題として読む）
  */
-export function AppBar({ actions }: { actions?: ReactNode }) {
+export function AppBar({ actions, heading }: { actions?: ReactNode; heading?: boolean }) {
   return (
     <TopBar
       title="シリアルスナップ"
       sub="forTUNE meets非公式ツール"
       leading={<Logo />}
       actions={actions}
+      heading={heading}
     />
   );
 }

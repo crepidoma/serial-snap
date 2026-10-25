@@ -5,8 +5,10 @@ import { build, type Plugin } from "vite";
 
 const ENTRY = fileURLToPath(new URL("../src/sw/sw.ts", import.meta.url));
 const PUBLIC_DIR = new URL("../public/", import.meta.url);
-/** 配信の設定で、ブラウザには届かないファイル。 */
-const NOT_SERVED = new Set(["_headers"]);
+/**
+ * 端末に保存しないファイル。_headers は配信の設定でブラウザに届かず、ほかは検索エンジンやSNS向けで画面が使わない。
+ */
+const NOT_CACHED = new Set(["_headers", "robots.txt", "sitemap.xml", "og-image.png"]);
 
 /** Service Worker を、配るファイルの一覧と保存先の名前を埋め込んで1つのファイルにまとめる。 */
 async function bundle(files: string[], cacheName: string): Promise<string> {
@@ -43,7 +45,7 @@ export function serviceWorker(): Plugin {
     // index.html の中身も版に含めるため、画面のファイルを出力し終えたあとに作る
     enforce: "post",
     async generateBundle(_options, output) {
-      const publicFiles = (await readdir(PUBLIC_DIR)).filter((f) => !NOT_SERVED.has(f));
+      const publicFiles = (await readdir(PUBLIC_DIR)).filter((f) => !NOT_CACHED.has(f));
       const files = [
         ...Object.keys(output).filter((f) => f !== "index.html"),
         ...publicFiles,

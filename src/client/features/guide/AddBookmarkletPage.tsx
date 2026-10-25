@@ -48,7 +48,10 @@ function detectDevice(): Device {
 /** コピーしてから次のステップへ進むまでの時間。「コピーしました」を読めるだけの間を置く。 */
 const AUTO_NEXT_MS = 1200;
 
-/** 案内で例に出す、ブックマークレットの名前。アプリのページのタイトルと同じで、追加するときに自動で入る。 */
+/**
+ * 案内で例に出す、ブックマークレットの名前。この画面の間だけページのタイトルをこれにし、
+ * ブックマークに追加するときに自動で入るようにする（ふだんのタイトルは検索結果向けに長い）。
+ */
 const EXAMPLE_NAME = "シリアルスナップ";
 
 /** 図の中で押す場所。対象の要素に「ここを押す」の枠を付けるため、角を丸めて少し余白を取る。 */
@@ -754,6 +757,13 @@ function pcSteps() {
 /** ブックマークレットの追加方法。端末ごとのタブで、1画面1ステップの図解を出す。 */
 export function AddBookmarkletPage() {
   const [device, setDevice] = useState<Device>(detectDevice);
+  useEffect(() => {
+    const original = document.title;
+    document.title = EXAMPLE_NAME;
+    return () => {
+      document.title = original;
+    };
+  }, []);
   const [step, setStep] = useState(0);
   const next = () => setStep(1);
   const steps =
