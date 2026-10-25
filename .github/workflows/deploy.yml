@@ -1,0 +1,95 @@
+name: Deploy
+
+# mainに入ったら、CIで検査してから本番へ配布する。配布の経路はこのワークフローだけ。
+# mainへのpushは、このリポジトリのブランチからのPRのマージで入ったものだけを配布する。
+# 手で配布するときは、Actionsから手動で実行する（workflow_dispatch）。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 配布を重ねない。
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  # mainに対するPRのマージで入ったコミットで、そのPRのCIが成功していれば、同じ検査を繰り返さない。
+  # PRを経ずにmainへpushされたコミットなら、ここで失敗させて配布しない。
+  tested:
+    runs-on: ubuntu-latest
+    # 実行環境が固まって止まらないことがあるため、どのジョブにもふだんの数倍の上限を付ける。
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    outputs:
+      found: ${{ steps.find.outputs.found }}
+    steps:
+      - id: find
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REPO_ID: ${{ github.repository_id }}
+        run: |
+          # forkからのPRは書き換えたCIで成功にできるため、このリポジトリのブランチからのPRだけを使う。
+          find_pr() {
+            gh api "repos/$REPO/commits/$GITHUB_SHA/pulls" --jq "[.[] | select(
+              .merged_at != null and .base.ref == \"main\" and .merge_commit_sha == \"$GITHUB_SHA\"
+              and .head.repo.id == $REPO_ID)][0].head.sha // empty"
+          }
+          head=$(find_pr)
+          # マージの直後は、コミットとPRの結び付きがAPIにまだ出ていないことがあるため、少し待って問い合わせ直す。
+          for wait in 10 20 30; do
+            if [ -n "$head" ] || [ "$GITHUB_EVENT_NAME" != push ]; then break; fi
+            sleep "$wait"
+            head=$(find_pr)
+          done
+          if [ -z "$head" ] && [ "$GITHUB_EVENT_NAME" = push ]; then
+            echo "::error::PRのマージを経ずにmainへpushされたため、配布しません。配布するならPRでマージするか、手動で実行してください。"
+            exit 1
+          fi
+          found=false
+          if [ -n "$head" ]; then
+            # 再実行で結果が変わることがあるため、PRの先頭のコミットで最後に動いたCIを見る。
+            conclusion=$(gh api \
+              "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$head&event=pull_request&per_page=1" \
+              --jq '.workflow_runs[0].conclusion // empty')
+            [ "$conclusion" = success ] && found=true
+          fi
+          echo "head=$head found=$found"
+          echo "found=$found" >> "$GITHUB_OUTPUT"
+
+  ci:
+    needs: tested
+    if: needs.tested.outputs.found != 'true'
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: [tested, ci]
+    # 配布に使うアカウントIDをリポジトリの変数 CLOUDFLARE_ACCOUNT_ID に置く。未設定なら配布しない。
+    # ciを飛ばしたときも配布する。tested・ciが失敗・中止したときは配布しない。
+    if: >-
+      !cancelled() && vars.CLOUDFLARE_ACCOUNT_ID != '' && needs.tested.result == 'success' &&
+      (needs.ci.result == 'success' || needs.ci.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # APIトークンは environment の secret に置き、承認などの保護をここで掛けられるようにする。
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: 配布する
+        run: npx wrangler deploy

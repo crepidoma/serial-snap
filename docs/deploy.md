@@ -1,16 +1,29 @@
 # 公開
 
-`npm run build` で `dist/` に静的ファイルを出力し、そのまま置く。ヘッダーなしでも動くが、ページを分離するヘッダー（COOP/COEP）がある公開先では、文字認識が複数スレッドになり約2倍速くなる。ヘッダーを付けられない公開先（GitHub Pages など）では1スレッドで動く。
+`npm run build` で `dist/` に静的ファイルを出力し、そのまま置く静的サイトとする。ヘッダーなしでも動くが、ページを分離するヘッダー（COOP/COEP）がある公開先では、文字認識が複数スレッドになり約2倍速くなる。ヘッダーを付けられない公開先（GitHub Pages など）では1スレッドで動く。
 
-## Cloudflare Pages
+`https://serial-snap.yabworks.com/` に、Cloudflare の Workers の静的アセットとして公開する（Worker のコードは持たない。設定は `wrangler.jsonc`）。配布の経路は `.github/workflows/deploy.yml` だけで、`main` に入ると CI で検査した後（`main` へのPRのマージで、そのPRのCIが成功していれば省く）に `wrangler deploy` する。PR を経ずに `main` へ push されたコミットは配布せず、ワークフローを失敗にする。手で配布するときは Actions → Deploy → Run workflow で動かす。
 
-1. Cloudflare Pages でGitHubのリポジトリをつなぐ。
-2. ビルドの設定を次にする。
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-   - 環境変数 `NODE_VERSION`: `24`
-3. 1ファイル25MBの上限があるが、最も大きいWASMでも約14MBで収まる。
-4. `public/_headers`（ビルドで `dist/_headers` になる）により、COOP/COEP のヘッダーが付き、文字認識が複数スレッドになる。
+## 配信の設定
+
+- `public/_headers`（ビルドで `dist/_headers` になる）で、次のヘッダーを付ける。
+  - COOP/COEP（文字認識を複数スレッドにする）、`X-Content-Type-Options`・`Referrer-Policy`・`frame-ancestors`。
+  - 画面と `sw.js` は `max-age=0` で毎回確かめ、`no-transform` で Cloudflare に HTML を書き換えさせない（ゾーンの Web Analytics の自動挿入や Email Obfuscation が入らないように）。
+  - `assets/` の下は名前にハッシュが入るため、1年キャッシュする。
+- 1ファイル25MiBの上限があるが、最も大きいWASMでも約14MBで収まる。
+- 静的アセットへのリクエストは無料で、Worker の呼び出しに数えない。
+
+## 準備
+
+1. ゾーン（yabworks.com）の設定を確かめる。このホストのための個別の設定は要らない。
+   - Web Analytics の自動挿入は、ゾーン全体で無効にしている（入っても `no-transform` で HTML は書き換えられない）。
+   - レート制限のルールは、Worker が動くパス（`/api/`・`/mcp`・`/oauth/`）だけを数える。このサイトは静的アセットだけで、そのパスを持たない。
+2. API トークンを作る。My Profile → API Tokens で「Edit Cloudflare Workers」のテンプレートから作り、Account Resources をこのアカウント、Zone Resources を yabworks.com に絞る。
+3. GitHub の設定。
+   - Settings → Environments で `production` を作り、Secrets に `CLOUDFLARE_API_TOKEN`（2 のトークン）を置く。必要なら承認者を付ける。
+   - Settings → Secrets and variables → Actions → Variables に `CLOUDFLARE_ACCOUNT_ID`（アカウントID）を置く。これがなければ、`main` に入っても配布しない。
+   - `main` を保護し、PR と CI の成功を必須にする（Settings → Rules）。
+4. PR をマージするか、Actions → Deploy → Run workflow で配布する。Custom Domain は最初の配布で作られる。
 
 ## 公開後に確かめること
 

@@ -10,6 +10,8 @@ forTUNE meets（ticket.fortunemeets.app）の抽選応募のシリアルナン�
 - スキャンは1回ごとに30日間残り、あとからコピーし直せます
 - 一度開けば通信なしでも使えます
 
+公開先: https://serial-snap.yabworks.com/
+
 非公式のツールです。応募サイトの運営者とは関係ありません。
 
 ## 使い方

@@ -4,6 +4,7 @@
 /styled-system/
 /coverage/
 /test-results/
+/.wrangler/
 
 # 手元だけの資料（実物のシリアルが写った写真など）
 /.local/

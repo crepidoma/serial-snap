@@ -6,7 +6,7 @@ import { serviceWorker } from "./scripts/vite-sw.ts";
 
 /**
  * ページを分離するヘッダー。文字認識を複数スレッドで動かすのに要る（SharedArrayBuffer を使うため）。
- * 公開先では public/_headers（Cloudflare Pages）で同じものを付ける。
+ * 公開先では public/_headers（Cloudflare の Workers の静的アセット）で同じものを付ける。
  */
 const ISOLATION_HEADERS = {
   "Cross-Origin-Opener-Policy": "same-origin",
