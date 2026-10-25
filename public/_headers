@@ -1,0 +1,6 @@
+# Cloudflare Pages が配信するときに付けるヘッダー。
+# ページを分離し、文字認識を複数スレッドで動かせるようにする（SharedArrayBuffer を使うため）。
+# GitHub Pages はヘッダーを付けられないため、そこでは1スレッドで動く。
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp

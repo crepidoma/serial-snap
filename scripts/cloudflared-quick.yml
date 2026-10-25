@@ -1,0 +1,4 @@
+# 開発サーバーを実機で確かめるための Quick Tunnel（npm run tunnel）が読む、振り分け（ingress）を持たない設定。
+# cloudflared は既定で ~/.cloudflared/config.yml を読み、そこに名前付きトンネルの振り分け（ingress）が
+# あると Quick Tunnel のURLにも適用されて 404 になるため、この設定を明示して読ませる。
+no-autoupdate: true
